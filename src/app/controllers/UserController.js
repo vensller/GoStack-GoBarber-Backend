@@ -1,6 +1,7 @@
 import * as Yup from 'yup';
 
 import User from '../models/User';
+import File from '../models/File';
 
 class UserController {
   async store(req, res) {
@@ -53,7 +54,7 @@ class UserController {
       return res.status(400).json({ error: 'Validation fails' });
     }
 
-    const { email, oldPassword } = req.body;
+    const { email, oldPassword, avatar_id } = req.body;
 
     const user = await User.findByPk(req.userId);
 
@@ -62,6 +63,14 @@ class UserController {
 
       if (userExists) {
         return res.status(400).json({ error: 'User already exists.' });
+      }
+    }
+
+    if (avatar_id){
+      const avatarExists = await File.findByPk(avatar_id);
+
+      if (!avatarExists){
+        return res.status(400).json({error: 'Avatar not found.'});
       }
     }
 
