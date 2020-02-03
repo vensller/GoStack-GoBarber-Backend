@@ -66,11 +66,11 @@ class UserController {
       }
     }
 
-    if (avatar_id){
+    if (avatar_id) {
       const avatarExists = await File.findByPk(avatar_id);
 
-      if (!avatarExists){
-        return res.status(400).json({error: 'Avatar not found.'});
+      if (!avatarExists) {
+        return res.status(400).json({ error: 'Avatar not found.' });
       }
     }
 
@@ -85,6 +85,7 @@ class UserController {
       name,
       email,
       provider,
+      avatar_id,
     });
   }
 }
