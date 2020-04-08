@@ -56,7 +56,15 @@ class UserController {
 
     const { email, oldPassword, avatar_id } = req.body;
 
-    const user = await User.findByPk(req.userId);
+    const user = await User.findByPk(req.userId, {
+      include: [
+        {
+          model: File,
+          as: 'avatar',
+          attributes: ['id', 'path', 'url'],
+        },
+      ],
+    });
 
     if (email && email !== user.email) {
       const userExists = await User.findOne({ where: { email } });
@@ -66,8 +74,12 @@ class UserController {
       }
     }
 
+    let avatarExists;
+
     if (avatar_id) {
-      const avatarExists = await File.findByPk(avatar_id);
+      avatarExists = await File.findByPk(avatar_id, {
+        attributes: ['id', 'path', 'url'],
+      });
 
       if (!avatarExists) {
         return res.status(400).json({ error: 'Avatar not found.' });
@@ -78,14 +90,14 @@ class UserController {
       return res.status(401).json({ error: 'Password does not match' });
     }
 
-    const { id, name, provider } = await user.update(req.body);
+    const { id, name, provider, avatar } = await user.update(req.body);
 
     return res.json({
       id,
       name,
       email,
       provider,
-      avatar_id,
+      avatar: avatarExists || avatar,
     });
   }
 }
